@@ -72,6 +72,15 @@ cdef public enum Frequency:
     Daily            = _period.Daily # once a day
     OtherFrequency   = _period.OtherFrequency # some other unknown frequency
 
+FREQUENCIES = ['NoFrequency', 'Once', 'Annual', 'Semiannual', 'EveryFourthMonth',
+               'Quarterly', 'Bimonthly', 'Monthly', 'EveryFourthWeek',
+               'Biweekly', 'Weekly', 'Daily', 'OtherFrequency']
+_FREQ_DICT = {globals()[name]:name for name in FREQUENCIES}
+def frequency_to_str(Frequency f):
+    """ Converts a PyQL Frequency to a human readable string. """
+    return _FREQ_DICT[f]
+
+
 cdef public enum TimeUnit:
     Days   = _period.Days
     Weeks  = _period.Weeks
@@ -230,6 +239,7 @@ cdef class Date:
     def __dealloc__(self):
         if self._thisptr is not NULL:
             del self._thisptr
+            self._thisptr = NULL
 
     property month:
         def __get__(self):
@@ -263,6 +273,10 @@ cdef class Date:
 
     def __repr__(self):
         return self.__str__()
+
+    def __hash__(self):
+        # Returns a hash based on the serial
+        return self.serial
 
     def __cmp__(self, date2):
         if isinstance(date2, (datetime.date, datetime.datetime)):
@@ -406,7 +420,7 @@ def is_leap(int year):
     '''Whether the given year is a leap one.'''
     return Date_isLeap(<Year> year)
 
-cdef inline Date date_from_qldate(QlDate& date):
+cdef Date date_from_qldate(QlDate& date):
     '''Converts a QuantLib::Date (QlDate) to a cython Date instance.
 
     Inefficient because taking a copy of the date ... but safe!
