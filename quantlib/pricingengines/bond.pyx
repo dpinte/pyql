@@ -8,7 +8,7 @@
 # distutils: language = c++
 from cython.operator cimport dereference as deref
 
-from quantlib.handle cimport Handle, shared_ptr
+from quantlib.handle cimport Handle, RelinkableHandle, shared_ptr
 cimport _pricing_engine as _pe
 cimport _bond
 
@@ -25,12 +25,12 @@ cdef class DiscountingBondEngine(PricingEngine):
         cdef Handle[_yts.YieldTermStructure] yts_handle
 
         if discount_curve.relinkable:
-            yts_handle = Handle[_yts.YieldTermStructure](
-                discount_curve._relinkable_ptr.get().currentLink()
-            )
+            # Dereference the returned RelinkableHandle out of the shared_ptr
+            # stored on the discount_curve
+            yts_handle = deref(discount_curve._relinkable_ptr.get())
         else:
             yts_handle = Handle[_yts.YieldTermStructure](
-                discount_curve._thisptr.get()
+                deref(discount_curve._thisptr)
             )
 
         self._thisptr = new shared_ptr[_pe.PricingEngine](
