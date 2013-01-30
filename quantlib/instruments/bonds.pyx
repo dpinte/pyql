@@ -135,9 +135,6 @@ cdef class FixedRateBond(Bond):
             cdef _date.Date* _issue_date
 
             if issue_date is None:
-                # empty issue rate seem to break some of the computation with
-                # segfaults. Do we really want to let the user do that ? Or
-                # shall we default on the first date of the schedule ?
                 self._thisptr = new shared_ptr[_instrument.Instrument](
                     new _bonds.FixedRateBond(settlement_days,
                         face_amount, deref(_fixed_bonds_schedule), deref(_coupons),
