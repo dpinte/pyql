@@ -59,6 +59,9 @@ cdef class FlatForward(YieldTermStructure):
         cdef ffwd.Handle[_qt.Quote] quote_handle
         cdef ffwd.Date _reference_date
 
+        if daycounter is None:
+            raise ValueError('You must provide a daycounter')
+
         if reference_date is not None:
             if isinstance(forward, Quote):
                 quote_handle = ffwd.Handle[_qt.Quote](deref( (<Quote>forward)._thisptr))
@@ -82,8 +85,7 @@ cdef class FlatForward(YieldTermStructure):
                         <Frequency>frequency
                     )
                 )
-        elif settlement_days is not None and \
-            calendar is not None:
+        elif calendar is not None:
 
             if isinstance(forward, Quote):
                 quote_handle = ffwd.Handle[_qt.Quote](deref( (<Quote>forward)._thisptr))
