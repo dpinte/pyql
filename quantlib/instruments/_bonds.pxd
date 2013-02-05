@@ -7,8 +7,9 @@ from quantlib.handle cimport shared_ptr, Handle
 from _instrument cimport Instrument
 from quantlib.time._calendar cimport BusinessDayConvention, Calendar
 from quantlib.time._date cimport Date
+from quantlib.time._period cimport Period
 from quantlib.time._daycounter cimport DayCounter
-from quantlib.time._schedule cimport Schedule
+from quantlib.time._schedule cimport Schedule, Rule
 
 cdef extern from 'ql/instruments/bond.hpp' namespace 'QuantLib':
     cdef cppclass Bond(Instrument):
@@ -51,6 +52,23 @@ cdef extern from 'ql/instruments/bonds/fixedratebond.hpp' namespace 'QuantLib':
                       BusinessDayConvention paymentConvention,
                       Real redemption,
                       Date& issueDate)
+        FixedRateBond(Natural settlementDays,
+                      Calendar& couponCalendar,
+                      Real faceAmount,
+                      Date& startDate,
+                      Date& maturityDate,
+                      Period& tenor,
+                      vector[Rate]& coupons,
+                      DayCounter& accrualDayCounter,
+                      BusinessDayConvention accrualConvention, # = Following,
+                      BusinessDayConvention paymentConvention, # = Following,
+                      Real redemption) # = 100.0,
+                      #Date& issueDate, # = Date(),
+                      #Date& stubDate, # = Date(),
+                      #Rule rule, # = DateGeneration::Backward,
+                      #bool endOfMonth, # = false,
+                      #const Calendar& paymentCalendar = Calendar());
+
         Date settlementDate()
 
 cdef extern from 'ql/instruments/bonds/zerocouponbond.hpp' namespace 'QuantLib':

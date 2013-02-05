@@ -24,7 +24,7 @@ from quantlib.time._calendar cimport BusinessDayConvention
 from quantlib.time._daycounter cimport DayCounter as QlDayCounter
 from quantlib.time._schedule cimport Schedule as QlSchedule
 from quantlib.time.calendar cimport Calendar
-from quantlib.time.date cimport Date, date_from_qldate
+from quantlib.time.date cimport Date, date_from_qldate, Period
 from quantlib.time.schedule cimport Schedule
 from quantlib.time.daycounter cimport DayCounter
 from quantlib.time.calendar import Following
@@ -112,9 +112,9 @@ cdef class FixedRateBond(Bond):
 
     Support:
         - simple annual compounding coupon rates
+        - simple annual compounding coupon rates with internal schedule calculation
 
     Unsupported: (needs interfacing)
-        - simple annual compounding coupon rates with internal schedule calculation
         - generic compounding and frequency InterestRate coupons
     """
 
@@ -122,7 +122,8 @@ cdef class FixedRateBond(Bond):
             Schedule fixed_bonds_schedule,
             coupons, DayCounter accrual_day_counter,
             payment_convention=Following,
-            float redemption=100.0, Date issue_date = None):
+            float redemption=100.0, Date issue_date=None, Calendar coupon_calendar=None,
+            Date start_date=None, Date maturity_date=None, Period period=None):
 
             # convert input type to internal structures
             cdef vector[Rate]* _coupons = new vector[Rate](len(coupons))
@@ -134,7 +135,22 @@ cdef class FixedRateBond(Bond):
 
             cdef _date.Date* _issue_date
 
-            if issue_date is None:
+            if fixed_bonds_schedule is None:
+                self._thisptr = new shared_ptr[_instrument.Instrument](
+                    new _bonds.FixedRateBond(
+                        settlement_days,
+                        deref(coupon_calendar._thisptr),
+                        face_amount,
+                        deref(start_date._thisptr.get()),
+                        deref(maturity_date._thisptr.get()),
+                        deref(period._thisptr.get()),
+                        deref(_coupons),
+                        deref(_accrual_day_counter),
+                        <BusinessDayConvention>payment_convention,
+                        <BusinessDayConvention>payment_convention,
+                        redemption)
+                )
+            elif issue_date is None:
                 self._thisptr = new shared_ptr[_instrument.Instrument](
                     new _bonds.FixedRateBond(settlement_days,
                         face_amount, deref(_fixed_bonds_schedule), deref(_coupons),
@@ -154,6 +170,8 @@ cdef class FixedRateBond(Bond):
                         redemption, deref(_issue_date)
                     )
                 )
+
+            del _coupons
 
 cdef class ZeroCouponBond(Bond):
     """ Zero coupon bond. """
