@@ -5,8 +5,9 @@
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 """
-
 # distutils: language = c++
+
+include '../types.pxi'
 
 
 from libcpp cimport bool
@@ -38,5 +39,8 @@ cdef extern from 'ql/pricingengines/bond/bondfunctions.hpp' namespace 'QuantLib:
     #cdef Date startDate 'QuantLib::BondFunctions::startDate'(Bond& bond)
     cdef Date startDate(Bond& bond)
     cdef Date maturityDate(Bond& bond)
+    cdef Real cleanPrice(Bond& bond, YieldTermStructure& discountCurve)
+    cdef Real cleanPrice(Bond& bond, YieldTermStructure& discountCurve,
+                         Date settlementDate)
 
 
