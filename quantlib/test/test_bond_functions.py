@@ -4,7 +4,7 @@ from quantlib.instruments.bonds import FixedRateBond
 from quantlib.pricingengines import bond_functions as bnd_func
 from quantlib.settings import Settings
 from quantlib.time.api import (
-    Date, TARGET, February, August, Following, Schedule, Jul, Years,
+    Date, TARGET, August, Following, Schedule, Jul, Years,
     Unadjusted, Period, Annual, ModifiedFollowing, Backward, ActualActual,
     ISMA
 )
@@ -41,13 +41,8 @@ class BondFunctionsTestCase(unittest.TestCase):
 
         issue_date = effective_date
         bond = FixedRateBond(
-            settlement_days,
-		    face_amount,
-		    fixed_bond_schedule,
-		    [coupon_rate],
-            ActualActual(ISMA),
-		    Following,
-            redemption,
+            settlement_days, face_amount, fixed_bond_schedule,
+            [coupon_rate], ActualActual(ISMA), Following, redemption,
             issue_date
         )
 
