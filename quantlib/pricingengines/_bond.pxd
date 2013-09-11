@@ -11,6 +11,8 @@
 
 from libcpp cimport bool
 
+from quantlib.instruments._bonds cimport Bond
+from quantlib.time._date cimport Date
 from quantlib.pricingengines._pricing_engine cimport PricingEngine
 from quantlib.handle cimport Handle
 from quantlib.termstructures._yield_term_structure cimport YieldTermStructure
@@ -28,5 +30,13 @@ cdef extern from 'ql/pricingengines/bond/discountingbondengine.hpp' namespace \
         DiscountingBondEngine(Handle[YieldTermStructure]& discountCurve)
         DiscountingBondEngine(Handle[YieldTermStructure]& discountCurve,
                 optional[bool] includeSttlementDateFlows)
+
+
+cdef extern from 'ql/pricingengines/bond/bondfunctions.hpp' namespace 'QuantLib::BondFunctions':
+
+    # QuantLib::BondFunctions static methods
+    #cdef Date startDate 'QuantLib::BondFunctions::startDate'(Bond& bond)
+    cdef Date startDate(Bond& bond)
+    cdef Date maturityDate(Bond& bond)
 
 
